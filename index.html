@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peta Minat – Klasifikasi Data dengan Himpunan</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f7f4;--surface:#fff;--ink:#1d2a2a;--muted:#5d6b6b;--line:#d9dfdb;--accent:#0f6e6e;--w:#2f7fd1;--d:#d1493f;--t:#d9a21b;--hl:#0f6e6e}
+@media (prefers-color-scheme:dark){:root{--bg:#121917;--surface:#1b2523;--ink:#e8efec;--muted:#9fb0ab;--line:#2f3d3a;--accent:#4fc3c3;--w:#5aa2ec;--d:#ee6b60;--t:#efc04a;--hl:#4fc3c3}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;padding:24px 16px 48px}
+main{max-width:980px;margin:0 auto}
+h1{font:700 clamp(1.8rem,4vw,2.6rem)/1.15 Fraunces,Georgia,serif;margin:0 0 8px}
+h2{font:600 1.25rem Fraunces,Georgia,serif;margin:0 0 12px}
+p.lead{color:var(--muted);max-width:62ch;margin:0 0 24px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
+label{display:block;font-size:.9rem;color:var(--muted);margin:10px 0 4px}
+select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit}
+select:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.row{display:flex;gap:10px}.row>div{flex:1}
+.formula{margin:16px 0 4px;font:600 1.05rem Fraunces,Georgia,serif}
+.card{color:var(--muted);font-size:.92rem;margin:0}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+button{border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:6px 10px;border-radius:6px;font:inherit;font-size:.85rem;cursor:pointer}
+button:hover{border-color:var(--accent)}
+svg{width:100%;height:auto;max-width:420px;display:block;margin:0 auto}
+.lab{font:600 13px Inter,sans-serif;fill:var(--ink);text-anchor:middle}
+.name{font:600 15px Inter,sans-serif;text-anchor:middle}
+.scroll{overflow-x:auto;margin-top:12px}
+table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--muted);font-weight:500}
+.tag{display:inline-block;min-width:1.5em;text-align:center;border-radius:4px;font-size:.8rem;font-weight:600;padding:0 5px;margin-right:3px;color:#fff}
+.tag.W{background:var(--w)}.tag.D{background:var(--d)}.tag.T{background:var(--t);color:#222}
+.dim{opacity:.35}
+footer{margin-top:28px;color:var(--muted);font-size:.88rem}
+</style>
+</head>
+<body>
+<main>
+<h1>Peta Minat</h1>
+<p class="lead">Pilih operasi himpunan untuk memetakan minat mahasiswa (Web, Desain, Data) dan membentuk tim proyek yang seimbang. Matematika Diskrit – Tugas Pertemuan 5.</p>
+
+<div class="grid">
+  <section class="panel" aria-labelledby="h-op">
+    <h2 id="h-op">Operasi</h2>
+    <label for="op">Jenis operasi</label>
+    <select id="op">
+      <option value="union">Union (A ∪ B)</option>
+      <option value="inter">Intersection (A ∩ B)</option>
+      <option value="diff">Difference (A − B)</option>
+      <option value="comp">Complement (Aᶜ)</option>
+    </select>
+    <div class="row">
+      <div><label for="a">Himpunan A</label>
+        <select id="a"><option value="W">W – Web</option><option value="D">D – Desain</option><option value="T">T – Data</option></select></div>
+      <div id="bwrap"><label for="b">Himpunan B</label>
+        <select id="b"><option value="D">D – Desain</option><option value="W">W – Web</option><option value="T">T – Data</option></select></div>
+    </div>
+    <p class="formula" id="formula"></p>
+    <p class="card" id="card"></p>
+    <div class="presets" id="presets"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-venn">
+    <h2 id="h-venn">Diagram Venn</h2>
+    <svg id="venn" viewBox="0 0 360 340" role="img" aria-label="Diagram Venn himpunan Web, Desain, dan Data"></svg>
+  </section>
+</div>
+
+<section class="panel" style="margin-top:20px" aria-labelledby="h-res">
+  <h2 id="h-res">Hasil: <span id="count"></span></h2>
+  <div class="scroll"><table id="result"><thead><tr><th>ID</th><th>Nama</th><th>Prodi</th><th>Angkatan</th><th>Minat</th></tr></thead><tbody></tbody></table></div>
+</section>
+
+<section class="panel" style="margin-top:20px" aria-labelledby="h-data">
+  <h2 id="h-data">Dataset sampel</h2>
+  <p class="card">U = seluruh mahasiswa, |U| = <span id="u"></span>. |W| = <span id="nw"></span>, |D| = <span id="nd"></span>, |T| = <span id="nt"></span>. Mahasiswa dapat masuk lebih dari satu himpunan.</p>
+  <div class="scroll"><table id="all"><thead><tr><th>ID</th><th>Nama</th><th>Prodi</th><th>Angkatan</th><th>Minat</th></tr></thead><tbody></tbody></table></div>
+</section>
+
+<footer>Kelompok: Azri Zulfia Fadhillah, Revanda Raswani, Muhammad Rayhan, Agustia Belliana, Naili Darzahri · Dosen pengampu: Ully Muzakir, MT</footer>
+</main>
+
+<script>
+// ID,Nama,Prodi,Angkatan,Web,Desain,Data
+const CSV = `M01,Aisyah,TI,2024,Y,T,Y
+M02,Budi,TI,2024,Y,T,T
+M03,Citra,SI,2023,Y,Y,T
+M04,Dimas,TI,2023,T,T,Y
+M05,Eka,SI,2024,T,Y,T
+M06,Farhan,TI,2025,Y,Y,Y
+M07,Gita,SI,2025,T,T,Y
+M08,Hadi,TI,2024,T,T,T
+M09,Indah,DKV,2023,T,Y,T
+M10,Joko,TI,2025,Y,T,T
+M11,Kiki,SI,2024,T,Y,Y
+M12,Lutfi,TI,2023,T,T,T
+M13,Maya,DKV,2025,Y,Y,T
+M14,Nanda,SI,2023,T,T,Y
+M15,Putri,TI,2024,Y,T,Y`;
+
+const students = CSV.split("\n").map(l => {
+  const [id, nama, prodi, angkatan, w, d, t] = l.split(",");
+  return {id, nama, prodi, angkatan, W: w === "Y", D: d === "Y", T: t === "Y"};
+});
+const U = new Set(students.map(s => s.id));
+const sets = {W: new Set(), D: new Set(), T: new Set()};
+students.forEach(s => ["W","D","T"].forEach(k => s[k] && sets[k].add(s.id)));
+const byId = Object.fromEntries(students.map(s => [s.id, s]));
+const NAMES = {W:"Web", D:"Desain", T:"Data"};
+
+// operasi himpunan (setara |, &, - dan U - A di Python)
+const union = (a, b) => new Set([...a, ...b]);
+const inter = (a, b) => new Set([...a].filter(x => b.has(x)));
+const diff = (a, b) => new Set([...a].filter(x => !b.has(x)));
+const comp = a => diff(U, a);
+
+const $ = id => document.getElementById(id);
+const sorted = s => [...s].sort();
+
+function compute() {
+  const op = $("op").value, A = $("a").value, B = $("b").value;
+  const a = sets[A], b = sets[B];
+  let res, formula, test, check = "";
+  if (op === "union") { res = union(a, b); formula = `${A} ∪ ${B}`; test = s => s[A] || s[B];
+    check = `|${A} ∪ ${B}| = |${A}| + |${B}| − |${A} ∩ ${B}| = ${a.size} + ${b.size} − ${inter(a,b).size} = ${res.size}`; }
+  if (op === "inter") { res = inter(a, b); formula = `${A} ∩ ${B}`; test = s => s[A] && s[B]; }
+  if (op === "diff") { res = diff(a, b); formula = `${A} − ${B}`; test = s => s[A] && !s[B]; }
+  if (op === "comp") { res = comp(a); formula = `${A}ᶜ terhadap U`; test = s => !s[A]; check = `|${A}ᶜ| = |U| − |${A}| = ${U.size} − ${a.size} = ${res.size}`; }
+  return {res, formula, test, check, op, A, B};
+}
+
+function rows(ids, tbody) {
+  tbody.innerHTML = ids.map(id => {
+    const s = byId[id];
+    const tags = ["W","D","T"].filter(k => s[k]).map(k => `<span class="tag ${k}">${k}</span>`).join("") || "–";
+    return `<tr><td>${s.id}</td><td>${s.nama}</td><td>${s.prodi}</td><td>${s.angkatan}</td><td>${tags}</td></tr>`;
+  }).join("") || `<tr><td colspan="5">Tidak ada mahasiswa yang cocok.</td></tr>`;
+}
+
+// Diagram Venn: setiap daerah digambar dengan clipPath/mask
+const C = {W:[130,125], D:[230,125], T:[180,205]}, R = 85;
+const REG = [ // [W,D,T], posisi label
+  [[1,0,0],[92,100]], [[0,1,0],[268,100]], [[0,0,1],[180,262]],
+  [[1,1,0],[180,88]], [[1,0,1],[130,190]], [[0,1,1],[230,190]], [[1,1,1],[180,145]]];
+const KEYS = ["W","D","T"];
+
+function drawVenn(test) {
+  let defs = "", body = "", labels = "";
+  KEYS.forEach(k => {
+    defs += `<clipPath id="c${k}"><circle cx="${C[k][0]}" cy="${C[k][1]}" r="${R}"/></clipPath>`;
+  });
+  REG.forEach(([m, pos], i) => {
+    const outs = KEYS.filter((k, j) => !m[j]);
+    const mask = outs.length ? `<mask id="m${i}"><rect width="360" height="340" fill="#fff"/>${outs.map(k => `<circle cx="${C[k][0]}" cy="${C[k][1]}" r="${R}" fill="#000"/>`).join("")}</mask>` : "";
+    defs += mask;
+    const ins = KEYS.filter((k, j) => m[j]);
+    const probe = {W: !!m[0], D: !!m[1], T: !!m[2]};
+    const on = test(probe);
+    let g = `<rect width="360" height="340" fill="${on ? "var(--hl)" : "transparent"}" opacity="${on ? .55 : 0}" ${outs.length ? `mask="url(#m${i})"` : ""}/>`;
+    ins.forEach(k => g = `<g clip-path="url(#c${k})">${g}</g>`);
+    body += g;
+    const n = students.filter(s => s.W === probe.W && s.D === probe.D && s.T === probe.T).length;
+    labels += `<text class="lab" x="${pos[0]}" y="${pos[1]}">${n}</text>`;
+  });
+  const outside = students.filter(s => !s.W && !s.D && !s.T).length;
+  const outOn = test({W:false, D:false, T:false});
+  const outlines = KEYS.map(k => `<circle cx="${C[k][0]}" cy="${C[k][1]}" r="${R}" fill="none" stroke="var(--${k.toLowerCase()})" stroke-width="2.5"/>`).join("");
+  const names = `<text class="name" x="70" y="38" fill="var(--w)">W Web</text><text class="name" x="290" y="38" fill="var(--d)">D Desain</text><text class="name" x="180" y="330" fill="var(--t)">T Data</text>`;
+  $("venn").innerHTML = `<defs>${defs}</defs>
+    <rect x="1" y="1" width="358" height="338" rx="8" fill="${outOn ? "var(--hl)" : "none"}" fill-opacity=".18" stroke="var(--line)"/>
+    ${body}${outlines}${names}${labels}
+    <text class="lab" x="330" y="322" style="text-anchor:end;font-weight:500">di luar: ${outside}</text>`;
+}
+
+function render() {
+  const {res, formula, test, check, op} = compute();
+  $("bwrap").style.display = op === "comp" ? "none" : "";
+  $("formula").textContent = formula;
+  $("card").textContent = `Kardinalitas = ${res.size}` + (check ? ` · ${check}` : "");
+  $("count").textContent = `${res.size} mahasiswa`;
+  rows(sorted(res), $("result").tBodies[0]);
+  drawVenn(test);
+}
+
+const PRESETS = [
+  ["Web tetapi belum Desain", "diff","W","D"], ["Web dan Desain","inter","W","D"],
+  ["Web atau Desain","union","W","D"], ["Bukan peminat Data","comp","T","D"]];
+$("presets").innerHTML = PRESETS.map((p, i) => `<button type="button" data-i="${i}">${p[0]}</button>`).join("");
+$("presets").addEventListener("click", e => {
+  const i = e.target.dataset.i; if (i === undefined) return;
+  const [, op, a, b] = PRESETS[i];
+  $("op").value = op; $("a").value = a; $("b").value = b; render();
+});
+["op","a","b"].forEach(id => $(id).addEventListener("change", render));
+
+$("u").textContent = U.size;
+$("nw").textContent = sets.W.size; $("nd").textContent = sets.D.size; $("nt").textContent = sets.T.size;
+rows(students.map(s => s.id), $("all").tBodies[0]);
+render();
+</script>
+</body>
+</html>
