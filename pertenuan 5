@@ -23,7 +23,6 @@ h3{font-size:15px;margin:16px 0 8px}
 label{font-size:13px;color:var(--muted);display:block;margin:10px 0 6px}
 input,select,button{font:inherit}
 input,select{width:100%;padding:11px 12px;border:1px solid #cbd5e1;border-radius:10px;background:white;color:var(--text)}
-select:disabled{background:#f1f5f9;color:#94a3b8;cursor:not-allowed}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 button{border:0;border-radius:10px;padding:11px 14px;background:var(--blue);color:white;font-weight:650;cursor:pointer}
 button:hover{filter:brightness(.94)}
@@ -49,6 +48,16 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:18px}
 .set-card{flex:1;min-width:160px;border-radius:12px;padding:12px;border:1px solid var(--line);background:#fff}
 .set-card b{display:block;margin-bottom:8px}
 .set-card span{font-size:12px;line-height:1.7;color:#42516a}
+.venn-panel{margin-top:18px}
+.venn-wrap{width:100%;overflow-x:auto}
+.venn-svg{display:block;width:100%;min-width:320px;max-width:760px;height:auto;margin:0 auto}
+.venn-circle{stroke-width:2.5;fill-opacity:.28}
+.venn-label{font-size:15px;font-weight:700;fill:#14213d;text-anchor:middle}
+.venn-region{font-size:11px;fill:#172033;text-anchor:middle;font-weight:700}
+.venn-region-list{font-size:10px;fill:#172033;text-anchor:middle;font-weight:500}
+.venn-legend{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0}
+.venn-legend span{font-size:12px;border-radius:999px;padding:6px 10px;background:#f1f5f9}
+@media(max-width:450px){.venn-svg{min-width:300px}.venn-region{font-size:10px}.venn-region-list{font-size:8px}}
 @media(max-width:800px){.stats{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}}
 @media(max-width:450px){.row{grid-template-columns:1fr}.stat strong{font-size:22px}}
 </style>
@@ -129,17 +138,39 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:18px}
 <div id="setCards" class="diagram"></div>
 <h3>Contoh aturan</h3>
 <ul class="note">
-<li>Jika mahasiswa mengambil Matematika Diskrit, ID masuk himpunan A.</li>
-<li>Jika mahasiswa mengambil Algoritma dan Pemrograman, ID masuk himpunan B.</li>
-<li>Jika mahasiswa mengambil Basis Data, ID masuk himpunan C.</li>
+<li>Jika mahasiswa mengambil Matematika Diskrit, nama mahasiswa masuk himpunan A.</li>
+<li>Jika mahasiswa mengambil Algoritma dan Pemrograman, nama mahasiswa masuk himpunan B.</li>
+<li>Jika mahasiswa mengambil Basis Data, nama mahasiswa masuk himpunan C.</li>
 <li>Komplemen A berarti anggota semesta U yang tidak ada di A.</li>
 </ul>
 </section>
 </div>
 
+<section class="panel venn-panel">
+<h2>03 · Diagram Venn Tiga Himpunan</h2>
+<p class="note">Diagram ini dibuat otomatis dari dataset. Nama mahasiswa ditampilkan langsung pada wilayah yang sesuai: hanya A, hanya B, hanya C, irisan dua himpunan, atau irisan ketiganya.</p>
+<div class="venn-wrap">
+<svg class="venn-svg" viewBox="0 0 600 410" role="img" aria-label="Diagram Venn himpunan A, B, dan C">
+  <circle class="venn-circle" cx="235" cy="165" r="125" fill="#60a5fa" stroke="#2563eb" />
+  <circle class="venn-circle" cx="365" cy="165" r="125" fill="#fbbf24" stroke="#d97706" />
+  <circle class="venn-circle" cx="300" cy="260" r="125" fill="#86efac" stroke="#16a34a" />
+  <text class="venn-label" x="160" y="75">A</text>
+  <text class="venn-label" x="440" y="75">B</text>
+  <text class="venn-label" x="300" y="390">C</text>
+  <g id="vennRegions"></g>
+</svg>
+</div>
+<div class="venn-legend">
+<span>🔵 A · Matematika Diskrit</span>
+<span>🟡 B · Algoritma & Pemrograman</span>
+<span>🟢 C · Basis Data</span>
+</div>
+<p class="note" id="vennSummary"></p>
+</section>
+
 <section class="panel wide">
 <div class="result-head">
-<h2 style="margin:0">03 · Dataset awal</h2>
+<h2 style="margin:0">04 · Dataset awal</h2>
 <span class="count" id="tableCount">15 record</span>
 </div>
 <label for="search">Cari ID, nama, atau mata kuliah</label>
@@ -156,7 +187,7 @@ footer{text-align:center;color:var(--muted);font-size:12px;padding:18px}
 </section>
 
 <section class="panel wide">
-<h2>04 · Makna hasil operasi</h2>
+<h2>05 · Makna hasil operasi</h2>
 <div class="row">
 <div><b>Gabungan (A ∪ B)</b><p class="note">Anggota yang berada di A atau B atau keduanya.</p></div>
 <div><b>Irisan (A ∩ B)</b><p class="note">Anggota yang berada di A dan B sekaligus.</p></div>
@@ -204,6 +235,31 @@ if(s.mata_kuliah.includes(labels.C)) membership.C.add(s.id);
 const U = new Set(data.map(s => s.id));
 const byId = id => data.find(s => s.id === id);
 const sortSet = s => [...s].sort();
+
+function renderVenn(){
+  const regions = [
+    {key:"A", label:"A saja", x:175, y:155, members:s=>membership.A.has(s.id)&&!membership.B.has(s.id)&&!membership.C.has(s.id)},
+    {key:"B", label:"B saja", x:425, y:155, members:s=>membership.B.has(s.id)&&!membership.A.has(s.id)&&!membership.C.has(s.id)},
+    {key:"C", label:"C saja", x:300, y:337, members:s=>membership.C.has(s.id)&&!membership.A.has(s.id)&&!membership.B.has(s.id)},
+    {key:"AB", label:"A ∩ B", x:300, y:130, members:s=>membership.A.has(s.id)&&membership.B.has(s.id)&&!membership.C.has(s.id)},
+    {key:"AC", label:"A ∩ C", x:235, y:253, members:s=>membership.A.has(s.id)&&membership.C.has(s.id)&&!membership.B.has(s.id)},
+    {key:"BC", label:"B ∩ C", x:365, y:253, members:s=>membership.B.has(s.id)&&membership.C.has(s.id)&&!membership.A.has(s.id)},
+    {key:"ABC", label:"A ∩ B ∩ C", x:300, y:210, members:s=>membership.A.has(s.id)&&membership.B.has(s.id)&&membership.C.has(s.id)}
+  ];
+  const svgText = (x,y,cls,txt) => `<text class="${cls}" x="${x}" y="${y}">${txt}</text>`;
+  document.getElementById("vennRegions").innerHTML = regions.map(r=>{
+    const people=data.filter(r.members);
+    const shown=people.slice(0,3);
+    let out=svgText(r.x,r.y,"venn-region",`${r.label} (${people.length})`);
+    shown.forEach((person,i)=>{out+=svgText(r.x,r.y+14+(i*12),"venn-region-list",person.nama);});
+    if(people.length>3) out+=svgText(r.x,r.y+14+(3*12),"venn-region-list",`+${people.length-3} nama lainnya`);
+    if(people.length===0) out+=svgText(r.x,r.y+13,"venn-region-list","∅");
+    return out;
+  }).join("");
+  const bothAB=[...membership.A].filter(id=>membership.B.has(id)).length;
+  const allThree=data.filter(s=>membership.A.has(s.id)&&membership.B.has(s.id)&&membership.C.has(s.id)).length;
+  document.getElementById("vennSummary").textContent=`Total ${U.size} mahasiswa. Anggota irisan A ∩ B (termasuk yang juga berada di C): ${bothAB}. Anggota irisan ketiga himpunan A ∩ B ∩ C: ${allThree}.`;
+}
 
 function renderSetCards(){
 document.getElementById("setCards").innerHTML =
@@ -290,8 +346,7 @@ document.getElementById("search").addEventListener("input",renderTable);
 
 document.getElementById("operation").addEventListener("change",() => {
 const op = document.getElementById("operation").value;
-const set2El = document.getElementById("set2");
-set2El.disabled = op === "complement";
+document.getElementById("set2").disabled = op === "complement";
 calculate();
 });
 
@@ -304,6 +359,7 @@ document.getElementById("bCount").textContent = membership.B.size;
 document.getElementById("cCount").textContent = membership.C.size;
 
 renderSetCards();
+renderVenn();
 renderTable();
 calculate();
 </script>
