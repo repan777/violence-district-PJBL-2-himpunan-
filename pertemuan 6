@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PJBL-2 | Visualisasi Himpunan</title>
+
+<style>
+:root {
+    --ungu: #6c4cf1;
+    --pink: #f45b9b;
+    --biru: #39a7ff;
+    --hijau: #22c997;
+    --gelap: #24213d;
+    --putih: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: var(--gelap);
+    background:
+        radial-gradient(circle at top left, #e4dcff, transparent 35%),
+        radial-gradient(circle at top right, #ffdeed, transparent 30%),
+        #f7f8ff;
+}
+
+header {
+    padding: 38px 20px;
+    color: white;
+    text-align: center;
+    background: linear-gradient(120deg, #6845ed, #a34ff0, #f45b9b);
+    border-radius: 0 0 32px 32px;
+    box-shadow: 0 10px 30px #8d62db44;
+}
+
+header .tag {
+    display: inline-block;
+    padding: 7px 15px;
+    border: 1px solid #ffffff77;
+    border-radius: 30px;
+    background: #ffffff22;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+header h1 {
+    margin: 17px 0 8px;
+    font-size: clamp(25px, 5vw, 38px);
+}
+
+header p {
+    margin: 0;
+    color: #f4eaff;
+}
+
+.container {
+    max-width: 1100px;
+    padding: 24px 16px 45px;
+    margin: auto;
+}
+
+.section-title {
+    margin: 25px 0 14px;
+    font-size: 21px;
+}
+
+.panel {
+    padding: 23px;
+    margin-bottom: 20px;
+    background: #ffffffdd;
+    border: 1px solid #ebe7ff;
+    border-radius: 22px;
+    box-shadow: 0 8px 25px #39316a0d;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    color: #30284b;
+    background: #faf9ff;
+    border: 1px solid #ded8f7;
+    border-radius: 12px;
+    outline: none;
+}
+
+input:focus, select:focus {
+    border-color: var(--ungu);
+    box-shadow: 0 0 0 3px #6c4cf122;
+}
+
+.help {
+    margin-top: 7px;
+    color: #77718e;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+button {
+    padding: 12px 18px;
+    border: 0;
+    border-radius: 12px;
+    color: white;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .2s, opacity .2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    opacity: .9;
+}
+
+.primary {
+    background: linear-gradient(110deg, #6845ed, #a34ff0);
+    box-shadow: 0 5px 13px #6845ed33;
+}
+
+.secondary {
+    background: linear-gradient(110deg, #28b9dc, #4384ff);
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.status {
+    display: none;
+    padding: 12px 15px;
+    margin-top: 15px;
+    border-radius: 12px;
+    line-height: 1.5;
+}
+
+.status.error {
+    display: block;
+    color: #a52b48;
+    background: #fff0f3;
+    border: 1px solid #ffc6d3;
+}
+
+.status.success {
+    display: block;
+    color: #087d5c;
+    background: #e9fff6;
+    border: 1px solid #b6f2dc;
+}
+
+.results {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.result-card {
+    padding: 18px;
+    overflow-wrap: anywhere;
+    background: white;
+    border: 1px solid #ebe7ff;
+    border-radius: 18px;
+    box-shadow: 0 5px 16px #30284b0a;
+}
+
+.result-card .symbol {
+    display: inline-flex;
+    width: 37px;
+    height: 37px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 12px;
+    background: var(--ungu);
+}
+
+.result-card:nth-child(3n+2) .symbol {
+    background: var(--pink);
+}
+
+.result-card:nth-child(3n) .symbol {
+    background: var(--hijau);
+}
+
+.result-card h3 {
+    margin: 0 0 8px;
+    font-size: 15px;
+}
+
+.set-value {
+    min-height: 27px;
+    color: #51476f;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.count {
+    margin-top: 10px;
+    color: var(--ungu);
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.visual-grid {
+    display: grid;
+    grid-template-columns: 1.15fr .85fr;
+    gap: 18px;
+    align-items: stretch;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    max-height: 370px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #f7f5ff, #fff5fa);
+}
+
+.formula {
+    padding: 18px;
+    margin-bottom: 12px;
+    border-radius: 15px;
+    background: #f2efff;
+    border-left: 5px solid var(--ungu);
+}
+
+.formula h3 {
+    margin: 0 0 10px;
+    font-size: 15px;
+}
+
+.formula p {
+    margin: 6px 0;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.pie-total {
+    padding: 17px;
+    color: white;
+    background: linear-gradient(110deg, #16b99a, #39a7ff);
+    border-radius: 15px;
+}
+
+.pie-total strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 25px;
+}
+
+footer {
+    padding: 20px;
+    color: #77718e;
+    text-align: center;
+    font-size: 13px;
+}
+
+@media (max-width: 750px) {
+    .form-grid, .results, .visual-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .panel {
+        padding: 17px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <span class="tag">PROJECT BASED LEARNING · SESI 2</span>
+    <h1>🎨 Visualisasi Operasi Himpunan</h1>
+    <p>Belajar himpunan dengan cara yang lebih interaktif dan menarik.</p>
+</header>
+
+<main class="container">
+
+    <h2 class="section-title">📝 Masukkan Data Himpunan</h2>
+
+    <section class="panel">
+        <div class="form-grid">
+            <div>
+                <label for="dataset">Pilih Contoh Dataset</label>
+                <select id="dataset">
+                    <option value="makanan">Dataset Makanan</option>
+                    <option value="mahasiswa">Dataset Mahasiswa</option>
+                    <option value="custom">Data Buatan Sendiri</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="setA">Himpunan A</label>
+                <input id="setA" value="Nasi, Ayam, Bakso, Soto">
+                <div class="help">Pisahkan setiap elemen dengan koma.</div>
+            </div>
+
+            <div>
+                <label for="setB">Himpunan B</label>
+                <input id="setB" value="Bakso, Soto, Mie, Sate">
+                <div class="help">Elemen yang sama akan dihitung satu kali.</div>
+            </div>
+
+            <div>
+                <label for="universal">Himpunan Semesta (U)</label>
+                <input id="universal"
+                       value="Nasi, Ayam, Bakso, Soto, Mie, Sate, Roti, Ikan">
+                <div class="help">Harus memuat seluruh elemen A dan B.</div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="primary" onclick="calculate()">
+                ✨ Hitung Operasi Himpunan
+            </button>
+            <button class="secondary" onclick="loadExample()">
+                🔄 Muat Dataset
+            </button>
+        </div>
+
+        <div id="status" class="status"></div>
+    </section>
+
+    <h2 class="section-title">🌈 Hasil Operasi Himpunan</h2>
+
+    <section class="results" id="results">
+        <article class="result-card">
+            <div class="symbol">∪</div>
+            <h3>Gabungan (A ∪ B)</h3>
+            <div class="set-value">Hasil akan tampil di sini.</div>
+        </article>
+    </section>
+
+    <h2 class="section-title">🟣 Diagram Venn</h2>
+
+    <section class="panel visual-grid">
+        <div>
+            <h3>Visualisasi A dan B</h3>
+            <p class="help">
+                Diagram menunjukkan elemen A, elemen B, dan bagian
+                yang dimiliki kedua himpunan.
+            </p>
+            <canvas id="venn" width="620" height="350"></canvas>
+        </div>
+
+        <div>
+            <h3>📐 Prinsip Inklusi-Eksklusi (PIE)</h3>
+            <div class="formula">
+                <h3>Rumus dua himpunan</h3>
+                <p>|A ∪ B| = |A| + |B| − |A ∩ B|</p>
+            </div>
+
+            <div class="formula">
+                <h3>Substitusi nilai</h3>
+                <p id="pieCalculation">Hasil perhitungan akan tampil di sini.</p>
+            </div>
+
+            <div class="pie-total">
+                Jumlah elemen gabungan
+                <strong id="pieResult">0 elemen</strong>
+            </div>
+        </div>
+    </section>
+
+    <h2 class="section-title">📚 Keterangan Operasi</h2>
+
+    <section class="panel">
+        <p><strong>Gabungan (A ∪ B):</strong> semua elemen yang terdapat
+        dalam A atau B.</p>
+
+        <p><strong>Irisan (A ∩ B):</strong> elemen yang terdapat pada
+        A sekaligus B.</p>
+
+        <p><strong>Selisih (A − B):</strong> elemen A yang tidak terdapat
+        dalam B.</p>
+
+        <p><strong>Komplemen (Aᶜ dan Bᶜ):</strong> elemen semesta U yang
+        tidak terdapat dalam A atau B.</p>
+
+        <p><strong>PIE:</strong> digunakan untuk menghitung jumlah elemen
+        gabungan tanpa menghitung elemen irisan dua kali.</p>
+    </section>
+
+</main>
+
+<footer>
+    PJBL-2 Sesi 2 · Implementasi Operasi Himpunan & Diagram Venn
+</footer>
+
+<script>
+const datasets = {
+    makanan: {
+        A: "Nasi, Ayam, Bakso, Soto",
+        B: "Bakso, Soto, Mie, Sate",
+        U: "Nasi, Ayam, Bakso, Soto, Mie, Sate, Roti, Ikan"
+    },
+    mahasiswa: {
+        A: "Andi, Budi, Citra, Dinda",
+        B: "Budi, Dinda, Eko, Fajar",
+        U: "Andi, Budi, Citra, Dinda, Eko, Fajar, Gina, Hadi"
+    },
+    custom: {
+        A: "",
+        B: "",
+        U: ""
+    }
+};
+
+function parseSet(value) {
+    return [...new Set(
+        value.split(",")
+            .map(item => item.trim())
+            .filter(item => item.length > 0)
+    )];
+}
+
+function intersection(A, B) {
+    return A.filter(x => B.includes(x));
+}
+
+function difference(A, B) {
+    return A.filter(x => !B.includes(x));
+}
+
+function union(A, B) {
+    return [...new Set([...A, ...B])];
+}
+
+function displaySet(items) {
+    return items.length ? "{ " + items.join(", ") + " }" : "∅ (himpunan kosong)";
+}
+
+function loadExample() {
+    const selected = document.getElementById("dataset").value;
+    const data = datasets[selected];
+
+    document.getElementById("setA").value = data.A;
+    document.getElementById("setB").value = data.B;
+    document.getElementById("universal").value = data.U;
+
+    if (selected !== "custom") {
+        calculate();
+    } else {
+        document.getElementById("status").className = "status";
+        document.getElementById("status").textContent = "";
+    }
+}
+
+function showStatus(message, type) {
+    const status = document.getElementById("status");
+    status.textContent = message;
+    status.className = "status " + type;
+}
+
+function calculate() {
+    const A = parseSet(document.getElementById("setA").value);
+    const B = parseSet(document.getElementById("setB").value);
+    const U = parseSet(document.getElementById("universal").value);
+
+    if (!A.length || !B.length || !U.length) {
+        showStatus("Isi himpunan A, B, dan U terlebih dahulu.", "error");
+        return;
+    }
+
+    if (!A.every(x => U.includes(x)) ||
+        !B.every(x => U.includes(x))) {
+        showStatus(
+            "Kesalahan: semua elemen A dan B harus terdapat dalam U.",
+            "error"
+        );
+        return;
+    }
+
+    const gabungan = union(A, B);
+    const irisan = intersection(A, B);
+    const AminusB = difference(A, B);
+    const BminusA = difference(B, A);
+    const komplemenA = difference(U, A);
+    const komplemenB = difference(U, B);
+
+    const results = [
+        ["∪", "Gabungan A ∪ B", gabungan],
+        ["∩", "Irisan A ∩ B", irisan],
+        ["−", "Selisih A − B", AminusB],
+        ["−", "Selisih B − A", BminusA],
+        ["ᶜ", "Komplemen Aᶜ", komplemenA],
+        ["ᶜ", "Komplemen Bᶜ", komplemenB]
+    ];
+
+    document.getElementById("results").innerHTML =
+        results.map(item => `
+            <article class="result-card">
+                <div class="symbol">${item[0]}</div>
+                <h3>${item[1]}</h3>
+                <div class="set-value">${displaySet(item[2])}</div>
+                <div class="count">${item[2].length} elemen</div>
+            </article>
+        `).join("");
+
+    const nA = A.length;
+    const nB = B.length;
+    const nIntersection = irisan.length;
+    const nUnion = nA + nB - nIntersection;
+
+    document.getElementById("pieCalculation").textContent =
+        `${nA} + ${nB} − ${nIntersection} = ${nUnion}`;
+
+    document.getElementById("pieResult").textContent =
+        `${nUnion} elemen`;
+
+    drawVenn(A, B, irisan);
+    showStatus("Berhasil! Semua operasi himpunan telah dihitung.", "success");
+}
+
+function drawVenn(A, B, I) {
+    const canvas = document.getElementById("venn");
+    const ctx = canvas.getContext("2d");
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Latar diagram
+    ctx.fillStyle = "#f8f6ff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Semesta U
+    ctx.strokeStyle = "#8175b5";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(18, 18, 584, 314);
+
+    ctx.fillStyle = "#514477";
+    ctx.font = "bold 17px Segoe UI";
+    ctx.fillText("U", 32, 43);
+
+    // Lingkaran A
+    ctx.beginPath();
+    ctx.arc(240, 175, 115, 0, Math.PI * 2);
+    ctx.fillStyle = "#9275ff88";
+    ctx.fill();
+    ctx.strokeStyle = "#7453e8";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Lingkaran B
+    ctx.beginPath();
+    ctx.arc(375, 175, 115, 0, Math.PI * 2);
+    ctx.fillStyle = "#ff75b788";
+    ctx.fill();
+    ctx.strokeStyle = "#e64d96";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.font = "bold 19px Segoe UI";
+    ctx.fillStyle = "#4931a5";
+    ctx.fillText("A", 185, 103);
+    ctx.fillStyle = "#b42f70";
+    ctx.fillText("B", 410, 103);
+
+    // Elemen yang hanya berada di A
+    ctx.font = "13px Segoe UI";
+    ctx.fillStyle = "#282044";
+
+    const onlyA = difference(A, B);
+    const onlyB = difference(B, A);
+
+    drawItems(ctx, onlyA, 190, 145, 95);
+
+    // Elemen irisan
+    drawItems(ctx, I, 310, 145, 95);
+
+    // Elemen yang hanya berada di B
+    drawItems(ctx, onlyB, 420, 145, 95);
+
+    // Elemen semesta di luar kedua lingkaran
+    const outside = difference(U, union(A, B));
+    ctx.fillStyle = "#625b78";
+    ctx.font = "12px Segoe UI";
+    ctx.fillText(
+        "Di luar A dan B: " + (outside.length ? outside.join(", ") : "∅"),
+        35, 305
+    );
+}
+
+function drawItems(ctx, items, x, y, maxWidth) {
+    ctx.textAlign = "center";
+    ctx.font = "12px Segoe UI";
+    ctx.fillStyle = "#282044";
+
+    if (!items.length) {
+        ctx.fillText("∅", x, y);
+        return;
+    }
+
+    const lines = [];
+    let currentLine = "";
+
+    for (const item of items) {
+        const nextLine = currentLine ? currentLine + ", " + item : item;
+
+        if (ctx.measureText(nextLine).width > maxWidth && currentLine) {
+            lines.push(currentLine);
+            currentLine = item;
+        } else {
+            currentLine = nextLine;
+        }
+    }
+
+    if (currentLine) lines.push(currentLine);
+
+    lines.forEach((line, index) => {
+        ctx.fillText(line, x, y + index * 18);
+    });
+}
+
+// Dataset otomatis mengikuti pilihan pengguna.
+document.getElementById("dataset").addEventListener("change", loadExample);
+
+// Hitung dataset awal saat halaman dibuka.
+calculate();
+</script>
+
+</body>
+</html>
