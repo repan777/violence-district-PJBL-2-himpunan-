@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SetLab — Sistem Klasifikasi Data dengan Himpunan</title>
+<style>
+:root{--bg:#f4f7fb;--panel:#fff;--ink:#172033;--muted:#6c7890;--line:#e5eaf2;--blue:#5267f2;--blue2:#7b8aff;--teal:#13b8a6;--pink:#ef5da8;--orange:#f4a340;--shadow:0 12px 35px rgba(35,52,92,.08)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer;border:0} .app{min-height:100vh}
+.sidebar{position:fixed;inset:0 auto 0 0;width:248px;background:#151c36;color:#e9edff;padding:25px 18px;display:flex;flex-direction:column;z-index:5}
+.brand{display:flex;align-items:center;gap:11px;padding:2px 10px 28px;font-size:20px;font-weight:850;letter-spacing:-.5px}.brand-icon{display:grid;place-items:center;width:39px;height:39px;border-radius:13px;background:linear-gradient(135deg,#7787ff,#43d9c5);color:#fff;font-size:20px}
+.nav-label{font-size:10px;text-transform:uppercase;letter-spacing:1.6px;color:#828eae;padding:10px 12px}
+.nav{display:flex;gap:12px;align-items:center;padding:12px;border-radius:12px;color:#aeb8d4;margin:3px 0;text-align:left;background:transparent;width:100%;font-weight:650}.nav .ico{width:22px;text-align:center;font-size:17px}.nav.active,.nav:hover{background:#293253;color:#fff}.nav.active{box-shadow:inset 3px 0 #6f82ff}
+.sidebar-bottom{margin-top:auto;border:1px solid #303a5c;border-radius:15px;padding:15px;background:#202946}.sidebar-bottom b{display:block;margin-bottom:5px}.sidebar-bottom p{color:#aab5d2;font-size:12px;margin:0 0 12px}.mini-pill{font-size:11px;background:#2d3a5f;color:#b8f6e9;padding:5px 9px;border-radius:20px;display:inline-block}
+.main{margin-left:248px;padding:30px clamp(18px,3vw,42px) 50px;max-width:1600px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:25px}.eyebrow{font-size:12px;color:var(--muted);font-weight:650}.topbar h1{font-size:clamp(24px,3vw,33px);line-height:1.2;margin:5px 0 0;letter-spacing:-1px}.top-actions{display:flex;gap:10px;align-items:center}.status{background:#e5fbf5;color:#11816f;border-radius:30px;padding:8px 12px;font-size:12px;font-weight:750}.btn{padding:10px 14px;border-radius:11px;font-weight:750;transition:.2s}.btn-primary{background:var(--blue);color:#fff;box-shadow:0 5px 12px #5267f22c}.btn-primary:hover{transform:translateY(-1px);background:#4055e6}.btn-soft{background:#eef1ff;color:#4456d9}.btn-outline{background:#fff;border:1px solid var(--line);color:#34405a}.btn-danger{background:#fff0f3;color:#cb3f65}
+.welcome{background:linear-gradient(115deg,#4e61ec 0%,#6978f6 55%,#31bcae 120%);border-radius:22px;padding:27px 30px;color:#fff;display:flex;justify-content:space-between;gap:20px;align-items:center;position:relative;overflow:hidden;box-shadow:0 16px 35px #5267f226}.welcome:after{content:"∪ ∩";position:absolute;right:18%;top:-48px;font-size:140px;font-weight:900;color:#ffffff12;transform:rotate(-12deg)}.welcome h2{font-size:24px;margin:0 0 8px;letter-spacing:-.5px}.welcome p{margin:0;color:#edf0ff;max-width:650px}.welcome .btn{margin-top:18px;background:#fff;color:#4e60e9;position:relative;z-index:1}.hero-art{font-size:68px;min-width:120px;text-align:center;position:relative;z-index:1}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:20px 0}.stat{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:18px;box-shadow:0 5px 18px #24395c05}.stat-top{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:12px;font-weight:700}.stat-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;font-size:17px}.stat strong{font-size:29px;letter-spacing:-1px;display:block;margin:11px 0 1px}.stat small{color:var(--muted);font-size:11px}
+.content-grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);gap:18px;align-items:start}.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:21px;box-shadow:var(--shadow);margin-bottom:18px;min-width:0}.panel-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:17px}.panel h3{margin:0;font-size:17px;letter-spacing:-.3px}.sub{font-size:12px;color:var(--muted);margin-top:4px}.tag{font-size:11px;font-weight:800;padding:5px 9px;border-radius:8px;background:#eef1ff;color:#4f61e8;white-space:nowrap}
+.field{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}.field label{font-size:12px;font-weight:750;color:#44516a}.field input,.field select,.searchbox{width:100%;border:1px solid #dfe5ef;background:#fbfcff;border-radius:10px;padding:11px 12px;color:var(--ink);outline:none}.field input:focus,.field select:focus,.searchbox:focus{border-color:#8c98ff;box-shadow:0 0 0 3px #5267f21c}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.file-drop{border:1.5px dashed #c8d1e4;background:#fafbff;border-radius:14px;padding:19px;text-align:center}.file-drop .upload-icon{font-size:28px}.file-drop p{margin:5px 0;color:var(--muted);font-size:12px}.file-drop input{max-width:100%;font-size:12px}.quick-datasets{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.quick-datasets button{background:#f1f3ff;color:#4d5ee2;border-radius:9px;padding:8px 10px;font-size:12px;font-weight:750}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.chip{padding:7px 10px;border-radius:9px;font-size:12px;font-weight:750;background:#f0f3fa;color:#4b5870}.chip.a{background:#e8edff;color:#4c60e9}.chip.b{background:#ffebf4;color:#c74386}
+.venn-wrap{background:linear-gradient(180deg,#fafbff,#f5f7ff);border:1px solid #edf0fa;border-radius:14px;padding:8px}.venn-wrap svg{width:100%;height:auto;display:block;max-height:310px}.venn-legend{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--muted);padding:8px 0 0}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+.formula{background:#f7f8ff;border:1px solid #e8ebff;border-radius:12px;padding:14px;margin-top:14px}.formula .equation{font-size:20px;font-weight:850;color:#485be4;text-align:center;margin:5px}.formula p{font-size:12px;color:var(--muted);text-align:center;margin:0}
+.operation-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.op-card{padding:14px;border:1px solid var(--line);border-radius:13px;background:#fff;cursor:pointer;text-align:left;transition:.18s;min-width:0}.op-card:hover,.op-card.selected{border-color:#8e9aff;background:#f8f9ff;box-shadow:0 0 0 2px #5267f211}.op-symbol{font-size:21px;font-weight:900;color:var(--blue)}.op-name{font-weight:800;font-size:13px;margin-top:4px}.op-desc{font-size:11px;color:var(--muted);margin-top:2px}.op-count{font-size:22px;font-weight:850;margin-top:11px}.op-result{font-size:11px;color:#65718a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}
+.table-tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:13px}.table-tools .searchbox{flex:1;min-width:170px}.table-tools select{border:1px solid var(--line);border-radius:10px;padding:9px;background:#fff;color:#46516a}.table-scroll{overflow:auto;border:1px solid var(--line);border-radius:12px}table{border-collapse:collapse;width:100%;font-size:12px;min-width:580px}th{background:#f7f8fc;color:#68748b;font-size:10px;text-transform:uppercase;letter-spacing:.5px;text-align:left}th,td{padding:12px 13px;border-bottom:1px solid #edf0f5}tr:last-child td{border-bottom:0}tbody tr:hover{background:#fafbff}.badge{display:inline-block;padding:4px 7px;border-radius:7px;font-size:10px;font-weight:800}.badge.a{background:#e9edff;color:#4d60e8}.badge.b{background:#ffebf4;color:#bf3e80}.badge.ab{background:#dff9f2;color:#128875}.badge.out{background:#edf0f5;color:#68748b}
+.detail-box{border:1px solid var(--line);border-radius:12px;padding:15px;margin-top:14px}.detail-box h4{margin:0 0 8px;font-size:14px}.member-list{display:flex;gap:7px;flex-wrap:wrap}.member{background:#f1f4fa;color:#45516b;border-radius:8px;padding:7px 9px;font-size:12px}.empty{padding:28px;text-align:center;color:var(--muted);font-size:13px}
+.section{display:none}.section.active{display:block}.footer{text-align:center;color:#8b95a8;font-size:11px;padding:20px}.toast{position:fixed;right:22px;bottom:22px;background:#17213c;color:#fff;border-radius:12px;padding:13px 17px;box-shadow:var(--shadow);z-index:20;opacity:0;transform:translateY(12px);transition:.25s;pointer-events:none}.toast.show{opacity:1;transform:translateY(0)}
+.help-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.help-card{border:1px solid var(--line);border-radius:13px;padding:15px}.help-card .n{font-size:12px;color:var(--blue);font-weight:900}.help-card b{display:block;margin:5px 0}.help-card p{font-size:12px;color:var(--muted);margin:0}
+@media(max-width:1100px){.sidebar{width:210px}.main{margin-left:210px}.stats{grid-template-columns:repeat(2,1fr)}.content-grid{grid-template-columns:1fr}}
+@media(max-width:700px){.sidebar{position:relative;width:100%;height:auto;padding:13px;display:block}.brand{padding:0 5px 10px}.sidebar .nav-label,.sidebar-bottom{display:none}.navs{display:flex;gap:5px;overflow:auto}.nav{width:auto;white-space:nowrap;padding:9px 10px;font-size:12px}.nav .ico{display:none}.main{margin:0;padding:18px 13px}.topbar{align-items:flex-start}.top-actions{flex-direction:column;align-items:flex-end}.status{display:none}.welcome{padding:22px}.hero-art{display:none}.stats{gap:9px}.stat{padding:13px}.stat strong{font-size:24px}.panel{padding:15px}.form-row{grid-template-columns:1fr}.help-grid{grid-template-columns:1fr}.operation-grid{gap:8px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand"><div class="brand-icon">∩</div><span>SetLab<span style="color:#8fa0ff">.</span></span></div>
+  <div class="nav-label">Workspace</div>
+  <div class="navs">
+    <button class="nav active" data-page="dashboard"><span class="ico">▦</span> Dashboard</button>
+    <button class="nav" data-page="data"><span class="ico">▤</span> Dataset & Kategori</button>
+    <button class="nav" data-page="operations"><span class="ico">∪</span> Operasi Himpunan</button>
+    <button class="nav" data-page="guide"><span class="ico">ⓘ</span> Panduan</button>
+  </div>
+  <div class="sidebar-bottom"><b>✦ Project PJBL-2</b><p>Klasifikasi data menggunakan konsep himpunan dan operasi matematika.</p><span class="mini-pill">● Mode lokal aktif</span></div>
+</aside>
+<main class="main">
+  <div class="topbar">
+    <div><div class="eyebrow">WORKSPACE / PJBL-2 FINAL</div><h1 id="pageTitle">Dashboard Analisis</h1></div>
+    <div class="top-actions"><span class="status">● Sistem siap digunakan</span><button class="btn btn-outline" id="resetBtn">↻ Reset</button></div>
+  </div>
+  <section class="section active" id="dashboard">
+    <div class="welcome"><div><h2>Selamat datang di SetLab 👋</h2><p>Eksplorasi data dengan teori himpunan. Klasifikasikan dataset, bandingkan kategori, dan lihat hasilnya melalui diagram Venn secara otomatis.</p><button class="btn" id="startBtn">Mulai analisis →</button></div><div class="hero-art">◉∩◉</div></div>
+    <div class="stats">
+      <div class="stat"><div class="stat-top">Total Data <span class="stat-icon" style="background:#edf0ff;color:#5267f2">▤</span></div><strong id="statTotal">0</strong><small>Anggota semesta (U)</small></div>
+      <div class="stat"><div class="stat-top">Kategori A <span class="stat-icon" style="background:#e8edff;color:#5267f2">A</span></div><strong id="statA">0</strong><small>Nilai memenuhi batas</small></div>
+      <div class="stat"><div class="stat-top">Kategori B <span class="stat-icon" style="background:#ffebf4;color:#d64b91">B</span></div><strong id="statB">0</strong><small>Kehadiran memenuhi batas</small></div>
+      <div class="stat"><div class="stat-top">Irisan A ∩ B <span class="stat-icon" style="background:#def8f1;color:#109780">∩</span></div><strong id="statAB">0</strong><small>Memenuhi kedua kategori</small></div>
+    </div>
+    <div class="content-grid">
+      <div>
+        <div class="panel">
+          <div class="panel-head"><div><h3>Visualisasi Diagram Venn</h3><div class="sub">Distribusi anggota berdasarkan kategori A dan B</div></div><span class="tag">LIVE CHART</span></div>
+          <div class="venn-wrap" id="vennDashboard"></div>
+          <div class="venn-legend"><span><i class="dot" style="background:#7182ff"></i>Kategori A</span><span><i class="dot" style="background:#ef70b0"></i>Kategori B</span><span><i class="dot" style="background:#23bda8"></i>Irisan A ∩ B</span></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><h3>Operasi Himpunan</h3><div class="sub">Pilih kartu untuk melihat anggota hasil operasi.</div></div><span class="tag">5 OPERASI</span></div>
+          <div class="operation-grid" id="operationCards"></div>
+        </div>
+      </div>
+      <div>
+        <div class="panel">
+          <div class="panel-head"><div><h3>Konfigurasi Kategori</h3><div class="sub">Atur batas klasifikasi untuk dataset aktif.</div></div><span class="tag">SETTINGS</span></div>
+          <div class="field"><label for="datasetSelect">Pilih dataset</label><select id="datasetSelect"><option value="1">Dataset 1 — Data Mahasiswa</option><option value="2">Dataset 2 — Data Mahasiswa Alternatif</option><option value="custom">Dataset yang diunggah</option></select></div>
+          <div class="form-row"><div class="field"><label for="nilaiThreshold">Batas nilai kategori A</label><input id="nilaiThreshold" type="number" min="0" max="100" value="70"></div><div class="field"><label for="hadirThreshold">Batas kehadiran kategori B (%)</label><input id="hadirThreshold" type="number" min="0" max="100" value="75"></div></div>
+          <button class="btn btn-primary" id="applyBtn" style="width:100%">Terapkan konfigurasi</button>
+          <div class="sub" style="margin-top:10px">A = nilai ≥ batas nilai. B = kehadiran ≥ batas kehadiran.</div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><h3>Validasi Inklusi–Eksklusi</h3><div class="sub">Memastikan perhitungan gabungan tepat.</div></div><span class="tag">CHECK</span></div>
+          <div class="formula"><p>Rumus kardinalitas gabungan</p><div class="equation">|A ∪ B| = |A| + |B| − |A ∩ B|</div><p id="formulaExplain"></p></div>
+          <div class="detail-box"><h4 id="validationTitle">✓ Perhitungan valid</h4><div class="sub" id="validationText">Hasil rumus sesuai dengan jumlah anggota gabungan.</div></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><h3>Dataset aktif</h3><div class="sub" id="datasetSummary">Ringkasan dataset</div></div></div>
+          <div class="chips"><span class="chip a" id="chipA">A: 0 anggota</span><span class="chip b" id="chipB">B: 0 anggota</span></div>
+          <button class="btn btn-outline" id="goDataBtn" style="width:100%">Lihat tabel data →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section" id="data">
+    <div class="panel">
+      <div class="panel-head"><div><h3>Dataset & Kategori</h3><div class="sub">Gunakan contoh data atau unggah CSV milik kelompokmu.</div></div><span class="tag">DATA MANAGER</span></div>
+      <div class="file-drop"><div class="upload-icon">⇧</div><b>Unggah dataset CSV</b><p>Format kolom: Nama, Nilai, Kehadiran. Nilai dan kehadiran menggunakan skala 0–100.</p><input type="file" id="fileInput" accept=".csv,text/csv"></div>
+      <div class="quick-datasets"><button id="load1">▤ Muat Dataset 1</button><button id="load2">▤ Muat Dataset 2</button><button id="downloadSource">⇩ Unduh dataset aktif</button><button id="exportAll" class="btn-soft">⇩ Ekspor hasil klasifikasi</button></div>
+      <div class="form-row" style="margin-top:20px"><div class="field"><label for="searchInput">Cari nama siswa</label><input id="searchInput" placeholder="Ketik nama..."></div><div class="field"><label for="filterSelect">Filter kategori</label><select id="filterSelect"><option value="all">Semua anggota</option><option value="A">Kategori A saja</option><option value="B">Kategori B saja</option><option value="AB">A ∩ B (keduanya)</option><option value="neither">Di luar A dan B</option></select></div></div>
+      <div class="table-tools"><span class="sub" id="tableCount" style="align-self:center">Menampilkan 0 data</span></div>
+      <div class="table-scroll"><table><thead><tr><th>No.</th><th>Nama</th><th>Nilai</th><th>Kehadiran</th><th>Kategori</th><th>Status</th></tr></thead><tbody id="dataTable"></tbody></table></div>
+    </div>
+    <div class="panel"><div class="panel-head"><div><h3>Definisi Himpunan</h3><div class="sub">Semesta U memuat semua baris data yang aktif.</div></div></div>
+      <div class="detail-box"><h4>Semesta U</h4><div class="sub">U = seluruh anggota dataset aktif.</div><div id="membersU" class="member-list" style="margin-top:10px"></div></div>
+      <div class="detail-box"><h4>Kategori A — Nilai memenuhi batas</h4><div class="sub" id="descA"></div><div id="membersA" class="member-list" style="margin-top:10px"></div></div>
+      <div class="detail-box"><h4>Kategori B — Kehadiran memenuhi batas</h4><div class="sub" id="descB"></div><div id="membersB" class="member-list" style="margin-top:10px"></div></div>
+    </div>
+  </section>
+  <section class="section" id="operations">
+    <div class="panel"><div class="panel-head"><div><h3>Laboratorium Operasi Himpunan</h3><div class="sub">Pilih operasi untuk memahami hasil klasifikasi.</div></div><span class="tag">SET THEORY</span></div>
+      <div class="operation-grid" id="operationCards2"></div>
+      <div class="detail-box" id="operationDetail"><h4>Pilih salah satu operasi</h4><div class="sub">Hasil operasi akan tampil di sini.</div></div>
+    </div>
+    <div class="panel"><div class="panel-head"><div><h3>Ringkasan Kardinalitas</h3><div class="sub">Jumlah anggota setiap himpunan dan operasi.</div></div><button class="btn btn-outline" id="exportOps">Unduh CSV</button></div>
+      <div class="table-scroll"><table><thead><tr><th>Notasi</th><th>Nama operasi</th><th>Jumlah anggota</th><th>Anggota</th></tr></thead><tbody id="opsTable"></tbody></table></div>
+    </div>
+  </section>
+  <section class="section" id="guide">
+    <div class="panel"><div class="panel-head"><div><h3>Panduan Penggunaan SetLab</h3><div class="sub">Langkah singkat untuk menjalankan aplikasi dan presentasi.</div></div><span class="tag">QUICK START</span></div>
+      <div class="help-grid">
+        <div class="help-card"><div class="n">LANGKAH 01</div><b>Pilih dataset</b><p>Gunakan Dataset 1 atau 2, atau unggah CSV dengan kolom Nama, Nilai, dan Kehadiran.</p></div>
+        <div class="help-card"><div class="n">LANGKAH 02</div><b>Tentukan kategori</b><p>Atur ambang nilai untuk A dan ambang kehadiran untuk B, lalu klik Terapkan konfigurasi.</p></div>
+        <div class="help-card"><div class="n">LANGKAH 03</div><b>Analisis diagram</b><p>Amati anggota A, B, irisan, gabungan, dan anggota yang tidak masuk kedua kategori.</p></div>
+        <div class="help-card"><div class="n">LANGKAH 04</div><b>Bandingkan operasi</b><p>Klik kartu operasi untuk melihat nama anggota dan penjelasan matematisnya.</p></div>
+        <div class="help-card"><div class="n">LANGKAH 05</div><b>Validasi hasil</b><p>Periksa rumus inklusi–eksklusi untuk memastikan jumlah anggota A ∪ B konsisten.</p></div>
+        <div class="help-card"><div class="n">LANGKAH 06</div><b>Ekspor laporan data</b><p>Unduh CSV dataset aktif atau ekspor hasil klasifikasi untuk lampiran laporan.</p></div>
+      </div>
+    </div>
+    <div class="panel"><h3>Konsep matematika yang digunakan</h3><div class="sub" style="margin-bottom:14px">U adalah semesta; A dan B adalah subset dari U.</div>
+      <div class="table-scroll"><table><thead><tr><th>Operasi</th><th>Notasi</th><th>Makna</th><th>Contoh kriteria</th></tr></thead><tbody>
+      <tr><td>Gabungan</td><td><b>A ∪ B</b></td><td>Anggota yang ada di A atau B atau keduanya.</td><td>Nilai memenuhi batas atau kehadiran memenuhi batas.</td></tr>
+      <tr><td>Irisan</td><td><b>A ∩ B</b></td><td>Anggota yang berada di A dan B sekaligus.</td><td>Nilai dan kehadiran sama-sama memenuhi batas.</td></tr>
+      <tr><td>Selisih</td><td><b>A − B</b></td><td>Anggota A yang tidak berada di B.</td><td>Nilai memenuhi batas, kehadiran belum memenuhi batas.</td></tr>
+      <tr><td>Selisih</td><td><b>B − A</b></td><td>Anggota B yang tidak berada di A.</td><td>Kehadiran memenuhi batas, nilai belum memenuhi batas.</td></tr>
+      <tr><td>Komplemen A</td><td><b>Aᶜ = U − A</b></td><td>Anggota semesta yang tidak berada di A.</td><td>Nilai belum memenuhi batas kategori A.</td></tr>
+      <tr><td>Komplemen B</td><td><b>Bᶜ = U − B</b></td><td>Anggota semesta yang tidak berada di B.</td><td>Kehadiran belum memenuhi batas kategori B.</td></tr>
+      </tbody></table></div>
+    </div>
+  </section>
+  <div class="footer">SetLab · PJBL-2 Final · Sistem Klasifikasi Data dengan Himpunan · Berjalan langsung di browser</div>
+</main>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const samples={
+1:[
+["Aditya",88,92],["Bella",76,85],["Citra",65,90],["Dimas",91,68],["Eka",72,78],["Farhan",58,60],["Gita",84,95],["Hendra",69,82],["Intan",95,98],["Joko",73,70],["Kartika",62,76],["Lukman",80,88],["Maya",55,72],["Nadia",77,91],["Oscar",68,55],["Putri",90,80],["Rafi",71,74],["Salsa",86,66],["Tono",64,84],["Vina",79,77]],
+2:[
+["Alya",82,96],["Bagas",67,81],["Cahya",74,70],["Dewi",92,88],["Evan",59,65],["Fikri",78,79],["Galih",69,92],["Hana",88,73],["Indra",73,85],["Jihan",61,74],["Kevin",95,97],["Laras",70,76],["Miko",84,62],["Nanda",66,89],["Oki",77,90],["Prita",54,58],["Qori",81,71],["Rizky",72,82],["Sinta",63,68],["Tegar",89,94],["Umar",68,77],["Wulan",76,69]]
+};
+let rows=[],datasetMode="1",thresholdA=70,thresholdB=75,selectedOp="union",filtered=[];
+const $=id=>document.getElementById(id);
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2500);}
+function loadDataset(id){datasetMode=String(id);rows=(samples[id]||samples[1]).map((r,i)=>({id:i+1,nama:r[0],nilai:Number(r[1]),kehadiran:Number(r[2])}));$("datasetSelect").value=datasetMode;$("datasetSummary").textContent=`Dataset ${id} · ${rows.length} mahasiswa`;render();toast(`Dataset ${id} berhasil dimuat`);}
+function sets(){const U=rows.slice(),A=U.filter(x=>x.nilai>=thresholdA),B=U.filter(x=>x.kehadiran>=thresholdB),ids=s=>new Set(s.map(x=>x.id));return {U,A,B,union:U.filter(x=>A.includes(x)||B.includes(x)),intersection:U.filter(x=>A.includes(x)&&B.includes(x)),aMinusB:U.filter(x=>A.includes(x)&&!B.includes(x)),bMinusA:U.filter(x=>B.includes(x)&&!A.includes(x)),compA:U.filter(x=>!A.includes(x)),compB:U.filter(x=>!B.includes(x)),neither:U.filter(x=>!A.includes(x)&&!B.includes(x))};}
+const ops=[
+{key:"union",symbol:"A ∪ B",name:"Gabungan (Union)",desc:"Anggota A atau B atau keduanya",color:"#5267f2"},
+{key:"intersection",symbol:"A ∩ B",name:"Irisan (Intersection)",desc:"Anggota yang ada di A dan B",color:"#13a992"},
+{key:"aMinusB",symbol:"A − B",name:"Selisih A − B",desc:"Anggota A yang bukan anggota B",color:"#6e7df4"},
+{key:"bMinusA",symbol:"B − A",name:"Selisih B − A",desc:"Anggota B yang bukan anggota A",color:"#e65a9c"},
+{key:"compA",symbol:"Aᶜ",name:"Komplemen A",desc:"Anggota U yang tidak ada di A",color:"#f1a23d"},
+{key:"compB",symbol:"Bᶜ",name:"Komplemen B",desc:"Anggota U yang tidak ada di B",color:"#f1a23d"}
+];
+function vennSVG(s){let a=s.A.length,b=s.B.length,ab=s.intersection.length,onlyA=s.aMinusB.length,onlyB=s.bMinusA.length,out=s.neither.length;return `<svg viewBox="0 0 460 280" role="img" aria-label="Diagram Venn kategori A dan B"><rect x="0" y="0" width="460" height="280" rx="12" fill="#f8f9ff"/><rect x="18" y="18" width="424" height="244" rx="14" fill="#fff" stroke="#dce2f0" stroke-width="1.5"/><text x="34" y="42" font-size="12" font-weight="700" fill="#7a859c">U = ${s.U.length} DATA</text><circle cx="183" cy="142" r="86" fill="#7182ff" fill-opacity=".55" stroke="#586cf0" stroke-width="2"/><circle cx="277" cy="142" r="86" fill="#ef70b0" fill-opacity=".5" stroke="#e85b9f" stroke-width="2"/><text x="144" y="83" font-size="17" font-weight="800" fill="#394bd0">A</text><text x="311" y="83" font-size="17" font-weight="800" fill="#bd3f7f">B</text><text x="139" y="148" text-anchor="middle" font-size="24" font-weight="850" fill="#2536a5">${onlyA}</text><text x="230" y="148" text-anchor="middle" font-size="24" font-weight="850" fill="#087e70">${ab}</text><text x="320" y="148" text-anchor="middle" font-size="24" font-weight="850" fill="#a22e6b">${onlyB}</text><text x="230" y="239" text-anchor="middle" font-size="12" font-weight="700" fill="#738099">Di luar A dan B: ${out}</text></svg>`}
+function memberNames(list){return list.length?list.map(x=>`<span class="member">${escapeHTML(x.nama)}</span>`).join(""):'<span class="sub">Tidak ada anggota</span>'}
+function renderOps(target){const s=sets();$(target).innerHTML=ops.map(o=>`<button class="op-card ${selectedOp===o.key?'selected':''}" data-op="${o.key}"><div class="op-symbol" style="color:${o.color}">${o.symbol}</div><div class="op-name">${o.name}</div><div class="op-desc">${o.desc}</div><div class="op-count">${s[o.key].length} <span style="font-size:11px;color:#8b95a8;font-weight:600">anggota</span></div><div class="op-result">${s[o.key].slice(0,5).map(x=>escapeHTML(x.nama)).join(", ")}${s[o.key].length>5?"…":""}</div></button>`).join("");$(target).querySelectorAll("[data-op]").forEach(b=>b.addEventListener("click",()=>{selectedOp=b.dataset.op;render();showOperation(selectedOp)}));}
+function renderTable(){const s=sets(),query=($("searchInput").value||"").toLowerCase(),filter=$("filterSelect").value;filtered=rows.filter(x=>{const a=x.nilai>=thresholdA,b=x.kehadiran>=thresholdB,cat=filter==="A"?a:filter==="B"?b:filter==="AB"?(a&&b):filter==="neither"?(!a&&!b):true;return x.nama.toLowerCase().includes(query)&&cat;});$("dataTable").innerHTML=filtered.length?filtered.map((x,i)=>{let a=x.nilai>=thresholdA,b=x.kehadiran>=thresholdB,cat=a&&b?'<span class="badge ab">A ∩ B</span>':a?'<span class="badge a">A saja</span>':b?'<span class="badge b">B saja</span>':'<span class="badge out">Di luar</span>';return `<tr><td>${i+1}</td><td><b>${escapeHTML(x.nama)}</b></td><td>${x.nilai}</td><td>${x.kehadiran}%</td><td>${cat}</td><td>${a&&b?"Memenuhi 2 kategori":a?"Memenuhi A":b?"Memenuhi B":"Belum memenuhi"}</td></tr>`}).join(""):'<tr><td colspan="6" class="empty">Tidak ada data yang cocok dengan filter.</td></tr>';$("tableCount").textContent=`Menampilkan ${filtered.length} dari ${rows.length} data`;}
+function renderOpsTable(){const s=sets(),all=[["U","Semesta",s.U],...ops.map(o=>[o.symbol,o.name,s[o.key]])];$("opsTable").innerHTML=all.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td><b>${r[2].length}</b></td><td>${r[2].map(x=>escapeHTML(x.nama)).join(", ")||"—"}</td></tr>`).join("");}
+function showOperation(key){const s=sets(),o=ops.find(x=>x.key===key)||ops[0],list=s[key];let expl={union:"Anggota yang terdapat di A, di B, atau pada keduanya.",intersection:"Anggota yang memenuhi syarat kategori A dan kategori B sekaligus.",aMinusB:"Anggota yang memenuhi kategori A tetapi tidak memenuhi kategori B.",bMinusA:"Anggota yang memenuhi kategori B tetapi tidak memenuhi kategori A.",compA:"Anggota semesta U yang tidak memenuhi syarat kategori A.",compB:"Anggota semesta U yang tidak memenuhi syarat kategori B."}[key];$("operationDetail").innerHTML=`<h4>${o.symbol} — ${o.name}</h4><div class="sub">${expl}</div><div class="chips"><span class="chip">Kardinalitas: |hasil| = ${list.length}</span><span class="chip">Semesta: |U| = ${s.U.length}</span></div><div class="member-list">${memberNames(list)}</div>`;}
+function render(){const s=sets();$("statTotal").textContent=s.U.length;$("statA").textContent=s.A.length;$("statB").textContent=s.B.length;$("statAB").textContent=s.intersection.length;$("vennDashboard").innerHTML=vennSVG(s);$("chipA").textContent=`A: ${s.A.length} anggota`;$("chipB").textContent=`B: ${s.B.length} anggota`;$("formulaExplain").textContent=`${s.A.length} + ${s.B.length} − ${s.intersection.length} = ${s.union.length}`;const calc=s.A.length+s.B.length-s.intersection.length,valid=calc===s.union.length;$("validationTitle").textContent=valid?"✓ Perhitungan valid":"⚠ Periksa perhitungan";$("validationText").textContent=valid?`Hasil rumus ${calc} sama dengan jumlah anggota A ∪ B (${s.union.length}).`:`Hasil rumus ${calc} tidak sama dengan jumlah gabungan ${s.union.length}.`;$("datasetSummary").textContent=`${datasetMode==="custom"?"Dataset unggahan":"Dataset "+datasetMode} · ${rows.length} mahasiswa`;$("descA").textContent=`A = {x ∈ U | nilai(x) ≥ ${thresholdA}} · ${s.A.length} anggota`;$("descB").textContent=`B = {x ∈ U | kehadiran(x) ≥ ${thresholdB}%} · ${s.B.length} anggota`;$("membersU").innerHTML=memberNames(s.U);$("membersA").innerHTML=memberNames(s.A);$("membersB").innerHTML=memberNames(s.B);renderOps("operationCards");renderOps("operationCards2");renderTable();renderOpsTable();showOperation(selectedOp);}
+function goPage(page){document.querySelectorAll(".section").forEach(s=>s.classList.toggle("active",s.id===page));document.querySelectorAll(".nav").forEach(n=>n.classList.toggle("active",n.dataset.page===page));$("pageTitle").textContent={dashboard:"Dashboard Analisis",data:"Dataset & Kategori",operations:"Operasi Himpunan",guide:"Panduan Penggunaan"}[page]||"SetLab";window.scrollTo({top:0,behavior:"smooth"});}
+document.querySelectorAll(".nav").forEach(n=>n.addEventListener("click",()=>goPage(n.dataset.page)));
+$("startBtn").onclick=() => goPage("data");$("goDataBtn").onclick=()=>goPage("data");$("load1").onclick=()=>loadDataset(1);$("load2").onclick=()=>loadDataset(2);
+$("datasetSelect").onchange=e=>{if(e.target.value!=="custom")loadDataset(Number(e.target.value));};
+$("applyBtn").onclick=()=>{thresholdA=Math.max(0,Math.min(100,Number($("nilaiThreshold").value)||0));thresholdB=Math.max(0,Math.min(100,Number($("hadirThreshold").value)||0));$("nilaiThreshold").value=thresholdA;$("hadirThreshold").value=thresholdB;render();toast("Batas kategori berhasil diterapkan");};
+$("searchInput").addEventListener("input",renderTable);$("filterSelect").addEventListener("change",renderTable);
+$("fileInput").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const txt=await f.text(),parsed=parseCSV(txt);if(!parsed.length)throw Error("CSV kosong atau format tidak sesuai.");rows=parsed.map((r,i)=>({id:i+1,nama:String(r.Nama??r.nama??r.name??"").trim(),nilai:Number(r.Nilai??r.nilai??r.value),kehadiran:Number(r.Kehadiran??r.kehadiran??r.Presensi??r.presensi)})).filter(r=>r.nama&&Number.isFinite(r.nilai)&&Number.isFinite(r.kehadiran));if(!rows.length)throw Error("Pastikan ada kolom Nama, Nilai, dan Kehadiran.");datasetMode="custom";$("datasetSelect").value="custom";$("datasetSummary").textContent=`Dataset unggahan · ${rows.length} baris valid`;render();toast(`${rows.length} baris berhasil diimpor`);}catch(err){toast("Gagal membaca CSV: "+err.message);}});
+function parseCSV(text){const lines=text.replace(/^\uFEFF/,"").trim().split(/\r?\n/);if(lines.length<2)return[];function split(line){let out=[],cur="",q=false;for(let i=0;i<line.length;i++){let c=line[i];if(c==='"'&&q&&line[i+1]==='"'){cur+='"';i++;}else if(c==='"')q=!q;else if(c===","&&!q){out.push(cur.trim());cur="";}else cur+=c;}out.push(cur.trim());return out;}const headers=split(lines[0]).map(h=>h.toLowerCase().replace(/^\ufeff/,""));return lines.slice(1).map(line=>{const vals=split(line),o={};headers.forEach((h,i)=>o[h]=vals[i]??"");return o;});}
+function csvEscape(v){const s=String(v??"");return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+function downloadCSV(filename,content){const blob=new Blob(["\uFEFF"+content],{type:"text/csv;charset=utf-8;"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);}
+$("downloadSource").onclick=()=>downloadCSV("dataset_aktif.csv","Nama,Nilai,Kehadiran\n"+rows.map(r=>[r.nama,r.nilai,r.kehadiran].map(csvEscape).join(",")).join("\n"));
+$("exportAll").onclick=()=>{const s=sets(),head=["Nama","Nilai","Kehadiran","Kategori A","Kategori B","A union B","A intersection B","A-B","B-A","Komplemen A","Komplemen B"];const body=rows.map(r=>{const a=r.nilai>=thresholdA,b=r.kehadiran>=thresholdB;return [r.nama,r.nilai,r.kehadiran,a?"Ya":"Tidak",b?"Ya":"Tidak",a||b?"Ya":"Tidak",a&&b?"Ya":"Tidak",a&&!b?"Ya":"Tidak",b&&!a?"Ya":"Tidak",!a?"Ya":"Tidak",!b?"Ya":"Tidak"];});downloadCSV("hasil_klasifikasi_setlab.csv",[head,...body].map(r=>r.map(csvEscape).join(",")).join("\n"));toast("Hasil klasifikasi diekspor");};
+$("exportOps").onclick=()=>{const s=sets(),data=[["Notasi","Operasi","Jumlah Anggota","Anggota"],["U","Semesta",s.U.length,s.U.map(x=>x.nama).join("; ")],...ops.map(o=>[o.symbol,o.name,s[o.key].length,s[o.key].map(x=>x.nama).join("; ")])];downloadCSV("ringkasan_operasi_himpunan.csv",data.map(r=>r.map(csvEscape).join(",")).join("\n"));};
+$("resetBtn").onclick=()=>{thresholdA=70;thresholdB=75;$("nilaiThreshold").value=70;$("hadirThreshold").value=75;$("searchInput").value="";$("filterSelect").value="all";loadDataset(1);goPage("dashboard");toast("Aplikasi dikembalikan ke pengaturan awal");};
+loadDataset(1);
+</script>
+</body>
+</html>
